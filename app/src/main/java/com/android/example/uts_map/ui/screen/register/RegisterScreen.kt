@@ -29,7 +29,6 @@ import kotlinx.coroutines.launch
 
 @Composable
 fun RegisterScreen(
-//    onRegisterClick: (String, String, String) -> Unit,
     onNavigateToLogin: () -> Unit
 ) {
     val snackbarHostState = remember { SnackbarHostState() }
@@ -38,7 +37,6 @@ fun RegisterScreen(
     var name by remember { mutableStateOf("") }
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
-
 
     Scaffold(
         snackbarHost = { SnackbarHost(snackbarHostState) }
@@ -79,7 +77,6 @@ fun RegisterScreen(
 
             Button(
                 onClick = {
-                    // Tampilkan snackbar
                     scope.launch {
                         snackbarHostState.showSnackbar("Registrasi berhasil!")
                         onNavigateToLogin()
@@ -97,4 +94,13 @@ fun RegisterScreen(
             }
         }
     }
+}
+
+
+@Preview(showBackground = true)
+@Composable
+fun RegisterScreenPreview() {
+    RegisterScreen(
+        onNavigateToLogin = {}
+    )
 }

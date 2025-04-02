@@ -1,65 +1,73 @@
 package com.android.example.uts_map.ui.screen.login
 
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.foundation.layout.*
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import kotlinx.coroutines.launch
 
 @Composable
 fun LoginScreen(
-    onLoginClick: (String, String) -> Unit,
+    onLoginSuccess: () -> Unit,
     onNavigateToRegister: () -> Unit
 ) {
-    var email by remember { mutableStateOf("")}
-    var password by remember { mutableStateOf("")}
+    val snackbarHostState = remember { SnackbarHostState() }
+    val scope = rememberCoroutineScope()
 
-    Column (
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(20.dp),
-        verticalArrangement = Arrangement.Center
-    ) {
-        // login title
-        Text("Login", style = MaterialTheme.typography.titleLarge)
-        Spacer(modifier = Modifier.height(18.dp))
+    var email by remember { mutableStateOf("") }
+    var password by remember { mutableStateOf("") }
 
-        // buat text email
-        OutlinedTextField(
-            value = email,
-            onValueChange = { email = it },
-            label =  { Text("EmaiL")},
-            modifier = Modifier.fillMaxWidth()
-        )
+    Scaffold(
+        snackbarHost = { SnackbarHost(snackbarHostState) }
+    ) { paddingValues ->
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(paddingValues)
+                .padding(20.dp),
+            verticalArrangement = Arrangement.Center
+        ) {
+            Text("Login", style = MaterialTheme.typography.titleLarge)
+            Spacer(modifier = Modifier.height(18.dp))
 
-        // buat text password
-        OutlinedTextField(
-            value = password,
-            onValueChange = { password = it},
-            label = { Text("Password")},
-            visualTransformation = PasswordVisualTransformation(),
-            modifier = Modifier.fillMaxWidth()
-        )
+            OutlinedTextField(
+                value = email,
+                onValueChange = { email = it },
+                label = { Text("Email") },
+                modifier = Modifier.fillMaxWidth()
+            )
 
-        Spacer(modifier = Modifier.height(20.dp))
+            OutlinedTextField(
+                value = password,
+                onValueChange = { password = it },
+                label = { Text("Password") },
+                visualTransformation = PasswordVisualTransformation(),
+                modifier = Modifier.fillMaxWidth()
+            )
 
-        TextButton(onClick = onNavigateToRegister) {
-            Text("Belum punya akun? Register di sini")
+            Spacer(modifier = Modifier.height(20.dp))
+
+            Button(
+                onClick = {
+                    scope.launch {
+                        snackbarHostState.showSnackbar("Login berhasil!")
+                        println("Login success, navigating to main")
+                        onLoginSuccess()
+                    }
+                },
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text("Login")
+            }
+
+            Spacer(modifier = Modifier.height(20.dp))
+
+            TextButton(onClick = onNavigateToRegister) {
+                Text("Belum punya akun? Register di sini")
+            }
         }
     }
 }
@@ -68,7 +76,7 @@ fun LoginScreen(
 @Composable
 fun LoginScreenPreview() {
     LoginScreen(
-        onLoginClick = { _, _ -> },
+        onLoginSuccess = {},
         onNavigateToRegister = {}
     )
 }

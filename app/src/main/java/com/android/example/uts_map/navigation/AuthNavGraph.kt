@@ -6,6 +6,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.android.example.uts_map.ui.screen.login.LoginScreen
+import com.android.example.uts_map.ui.screen.main.MainScreen
 import com.android.example.uts_map.ui.screen.register.RegisterScreen
 import com.android.example.uts_map.ui.screen.welcome.WelcomeScreen
 
@@ -21,15 +22,29 @@ fun AuthNavGraph(navController: NavHostController = rememberNavController()) {
 
         composable("login") {
             LoginScreen(
-                onLoginClick = {_, _ -> },
-                onNavigateToRegister = { navController.navigate("register") }
+                onLoginSuccess = {
+                    navController.navigate("main") {
+                        popUpTo("login") { inclusive = true}
+                    }
+                },
+                onNavigateToRegister = {
+                    navController.navigate("register")
+                }
             )
         }
 
         composable("register") {
             RegisterScreen(
-                onNavigateToLogin = { navController.navigate("login") }
+                onNavigateToLogin = {
+                    navController.navigate("login") {
+                        popUpTo("register") { inclusive = true }
+                    }
+                }
             )
+        }
+
+        composable("main") {
+            MainScreen()
         }
     }
 }
