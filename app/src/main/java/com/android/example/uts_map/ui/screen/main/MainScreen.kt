@@ -1,14 +1,17 @@
 package com.android.example.uts_map.ui.screen.main
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.compose.*
-import com.android.example.uts_map.ui.component.navbar.BottomNavItem
 import com.android.example.uts_map.ui.component.navbar.BottomNavigationBar
+import com.android.example.uts_map.ui.screen.journey.JourneyScreen
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun MainScreen() {
     val navController = rememberNavController()
@@ -32,7 +35,7 @@ fun MainScreen() {
         ) {
             composable("journey") {
                 println(">> Showing Journey Screen")
-                Text("Journey Screen", modifier = Modifier.padding(16.dp))
+                JourneyScreen()
             }
             composable("calendar") {
                 println(">> Showing Calendar Screen")
