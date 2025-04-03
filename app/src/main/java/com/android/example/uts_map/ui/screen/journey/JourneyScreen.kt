@@ -41,7 +41,9 @@ import java.util.Locale
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun JourneyScreen() {
+fun JourneyScreen(
+    onNewEntryClick: () -> Unit
+) {
     Scaffold(
         topBar = {
             TopAppBar(
@@ -67,9 +69,9 @@ fun JourneyScreen() {
         },
         floatingActionButton = {
             ExtendedFloatingActionButton(
-                onClick = {/* TODO: Add new entry */ },
+                onClick = onNewEntryClick,
                 icon = { Icon(Icons.Default.Add, contentDescription = "Add") },
-                text = { Text("New Entry") }
+                text = { Text("New Notes") }
             )
         }
     ) { paddingValues ->

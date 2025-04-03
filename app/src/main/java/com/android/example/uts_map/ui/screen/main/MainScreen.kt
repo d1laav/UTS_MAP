@@ -10,6 +10,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.compose.*
 import com.android.example.uts_map.ui.component.navbar.BottomNavigationBar
 import com.android.example.uts_map.ui.screen.journey.JourneyScreen
+import com.android.example.uts_map.ui.screen.journey.NewEntryScreen
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
@@ -35,7 +36,16 @@ fun MainScreen() {
         ) {
             composable("journey") {
                 println(">> Showing Journey Screen")
-                JourneyScreen()
+                JourneyScreen(
+                    onNewEntryClick = {
+                        navController.navigate("new_entry")
+                    }
+                )
+            }
+            composable("new_entry") {
+                NewEntryScreen(
+                    onSave = { navController.popBackStack()}
+                )
             }
             composable("calendar") {
                 println(">> Showing Calendar Screen")
