@@ -84,7 +84,8 @@ fun MainScreen() {
                         newEntry.id = idCounter.value++
                         diaryList.add(newEntry)
                         navController.popBackStack()
-                    }
+                    },
+                    navController = navController
                 )
             }
 
@@ -143,7 +144,8 @@ fun MainScreen() {
                         },
                         onNavigateBack = {
                             navController.popBackStack()
-                        }
+                        },
+                        navController = navController
                     )
                 }
             }

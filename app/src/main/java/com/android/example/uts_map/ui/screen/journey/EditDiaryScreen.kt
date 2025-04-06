@@ -17,6 +17,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import com.android.example.uts_map.model.DiaryEntry
 import kotlinx.coroutines.launch
@@ -26,7 +27,8 @@ fun EditDiaryScreen(
     entry: DiaryEntry,
     onSave: () -> Unit,
     onDelete: () -> Unit,
-    onNavigateBack: () -> Unit
+    onNavigateBack: () -> Unit,
+    navController: NavController
 ) {
     var title by remember { mutableStateOf(entry.title) }
     var content by remember { mutableStateOf(entry.content) }
@@ -136,7 +138,9 @@ fun EditDiaryScreen(
                 Spacer(Modifier.width(12.dp))
 
                 Button(
-                    onClick = { /* TODO: implement Geotag */ },
+                    onClick = {
+                        navController.navigate("map_picker")
+                    },
                     modifier = Modifier.weight(1f)
                 ) {
                     Icon(Icons.Default.Place, contentDescription = "Geotag")

@@ -19,6 +19,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import com.android.example.uts_map.model.DiaryEntry
 import com.android.example.uts_map.utils.getCurrentTimeString
@@ -28,7 +29,8 @@ import kotlin.random.Random
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun NewEntryScreen(
-    onSave: (DiaryEntry) -> Unit
+    onSave: (DiaryEntry) -> Unit,
+    navController: NavController
 ) {
     var title by remember { mutableStateOf("") }
     var content by remember { mutableStateOf("") }
@@ -142,7 +144,9 @@ fun NewEntryScreen(
                 Spacer(Modifier.width(12.dp))
 
                 Button(
-                    onClick = { /* TODO: implement Geotag */ },
+                    onClick = {
+                        navController.navigate("map_picker")
+                    },
                     modifier = Modifier.weight(1f)
                 ) {
                     Icon(Icons.Default.Place, contentDescription = "Geotag")

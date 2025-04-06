@@ -21,16 +21,22 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -49,16 +55,53 @@ fun JourneyScreen(
     onEntryClick: (DiaryEntry) -> Unit,
     onNewEntryClick: () -> Unit
 ) {
+
+    var searchQuery by remember { mutableStateOf("") }
+    var isSearching by remember { mutableStateOf(false) }
+
+    val filteredList = if (searchQuery.isBlank()) {
+        diaryList
+    } else {
+        diaryList.filter {
+            it.title.contains(searchQuery, ignoreCase = true) ||
+                    it.content.contains(searchQuery, ignoreCase = true)
+        }
+    }
+
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Halo, Nama Pengguna") },
-                actions = {
-                    IconButton(onClick = { /* TODO: Search */ }) {
-                        Icon(Icons.Default.Search, contentDescription = "Search")
+                title = {
+                    if (isSearching) {
+                        OutlinedTextField(
+                            value = searchQuery,
+                            onValueChange = { searchQuery = it },
+                            placeholder = { Text("Cari catatan...") },
+                            singleLine = true,
+                            modifier = Modifier.fillMaxWidth(),
+                            trailingIcon = {
+                                if (searchQuery.isNotBlank()) {
+                                    IconButton(onClick = { searchQuery = "" }) {
+                                        Icon(Icons.Default.Close, contentDescription = "Clear")
+                                    }
+                                }
+                            }
+                        )
+                    } else {
+                        Text("Halo, Nama Pengguna")
                     }
-                    IconButton(onClick = { /* TODO: Profile */ }) {
-                        Icon(Icons.Default.AccountCircle, contentDescription = "Profile")
+                },
+                actions = {
+                    IconButton(onClick = {
+                        isSearching = !isSearching
+                        if (!isSearching) {
+                            searchQuery = ""
+                        }
+                    }) {
+                        Icon(
+                            imageVector = if (isSearching) Icons.Default.Close else Icons.Default.Search,
+                            contentDescription = if (isSearching) "Tutup pencarian" else "Cari"
+                        )
                     }
                 }
             )
@@ -67,16 +110,25 @@ fun JourneyScreen(
             ExtendedFloatingActionButton(
                 onClick = onNewEntryClick,
                 icon = { Icon(Icons.Default.Add, contentDescription = "Add") },
-                text = { Text("New Entry") }
+                text = { Text("New Notes") }
             )
         }
     ) { padding ->
+        val filteredList = if (searchQuery.isBlank()) {
+            diaryList
+        } else {
+            diaryList.filter {
+                it.title.contains(searchQuery, ignoreCase = true) ||
+                        it.content.contains(searchQuery, ignoreCase = true)
+            }
+        }
+
+        //filteredList yang sudah difilter dan disortir
         val formatter = DateTimeFormatter.ofPattern("MMMM dd, yyyy", Locale.ENGLISH)
 
-        val grouped = diaryList
-            .sortedByDescending { LocalDate.parse(it.date, formatter) }
+        val grouped = filteredList
+            .sortedByDescending { LocalDate.parse(it.date, formatter) } // ⬅️ Sort di sini
             .groupBy { it.date }
-
 
         LazyColumn(
             modifier = Modifier
@@ -100,6 +152,7 @@ fun JourneyScreen(
                 }
             }
         }
+
     }
 }
 
