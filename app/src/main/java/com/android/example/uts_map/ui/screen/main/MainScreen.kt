@@ -7,9 +7,12 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavType
 import androidx.navigation.compose.*
+import androidx.navigation.navArgument
 import com.android.example.uts_map.model.DiaryEntry
 import com.android.example.uts_map.ui.component.navbar.BottomNavigationBar
+import com.android.example.uts_map.ui.screen.journey.DetailDiaryScreen
 import com.android.example.uts_map.ui.screen.journey.EditDiaryScreen
 import com.android.example.uts_map.ui.screen.journey.JourneyScreen
 import com.android.example.uts_map.ui.screen.journey.NewEntryScreen
@@ -20,7 +23,7 @@ fun MainScreen() {
     val navController = rememberNavController()
     val currentBackStack by navController.currentBackStackEntryAsState()
     val currentRoute = currentBackStack?.destination?.route ?: "journey"
-
+    val idCounter = remember { mutableIntStateOf(1000) }
 
     val diaryList = remember {
         mutableStateListOf<DiaryEntry>(
@@ -68,7 +71,7 @@ fun MainScreen() {
                         .sortedWith(compareByDescending<DiaryEntry> { it.date }
                             .thenByDescending { it.time }),
                     onEntryClick = { entry ->
-                        navController.navigate("edit_entry/${entry.id}")
+                        navController.navigate("detail_entry/${entry.id}")
                     },
                     onNewEntryClick = {
                         navController.navigate("new_entry")
@@ -78,17 +81,57 @@ fun MainScreen() {
             composable("new_entry") {
                 NewEntryScreen(
                     onSave = { newEntry ->
-                        diaryList.add(0, newEntry)
+                        newEntry.id = idCounter.value++
+                        diaryList.add(newEntry)
                         navController.popBackStack()
                     }
                 )
             }
 
+            composable(
+                route = "detail_entry/{id}",
+                arguments = listOf(navArgument("id") { type = NavType.IntType })
+            ) { backStackEntry ->
+                val id = backStackEntry.arguments?.getInt("id")
+                val entry = diaryList.find { it.id == id }
+
+                if (entry != null) {
+                    val currentIndex = diaryList.indexOf(entry)
+
+                    DetailDiaryScreen(
+                        entry = entry,
+                        onBack = { navController.popBackStack() },
+                        onEditClick = {
+                            navController.navigate("edit_entry/${entry.id}")
+                        },
+                        onPrevClick = {
+                            val prev = diaryList.getOrNull(currentIndex - 1)
+                            if (prev != null) {
+                                navController.navigate("detail_entry/${prev.id}") {
+                                    popUpTo("detail_entry/$id") { inclusive = true }
+                                }
+                            }
+                        },
+                        onNextClick = {
+                            val next = diaryList.getOrNull(currentIndex + 1)
+                            if (next != null) {
+                                navController.navigate("detail_entry/${next.id}") {
+                                    popUpTo("detail_entry/$id") { inclusive = true }
+                                }
+                            }
+                        }
+                    )
+                }
+            }
             composable("edit_entry/{id}") { backStackEntry ->
                 val entryId = backStackEntry.arguments?.getString("id")?.toIntOrNull()
                 val entry = diaryList.find { it.id == entryId }
 
-                if (entry != null) {
+                if (entry == null) {
+                    LaunchedEffect(Unit) {
+                        navController.popBackStack()
+                    }
+                } else {
                     EditDiaryScreen(
                         entry = entry,
                         onSave = {
@@ -102,10 +145,9 @@ fun MainScreen() {
                             navController.popBackStack()
                         }
                     )
-                } else {
-                    Text("Catatan tidak ditemukan")
                 }
             }
+
 
             composable("calendar") {
                 println(">> Showing Calendar Screen")

@@ -2,38 +2,22 @@
 
 package com.android.example.uts_map.ui.screen.journey
 
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
+import android.net.Uri
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Image
 import androidx.compose.material.icons.filled.Place
-import androidx.compose.material3.Button
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SnackbarHost
-import androidx.compose.material3.SnackbarHostState
-import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
+import coil.compose.AsyncImage
 import com.android.example.uts_map.model.DiaryEntry
 import kotlinx.coroutines.launch
 
@@ -46,9 +30,18 @@ fun EditDiaryScreen(
 ) {
     var title by remember { mutableStateOf(entry.title) }
     var content by remember { mutableStateOf(entry.content) }
+    var imageUri by remember { mutableStateOf(entry.imageUri?.let { Uri.parse(it) }) }
 
     val snackbarHostState = remember { SnackbarHostState() }
     val coroutineScope = rememberCoroutineScope()
+
+    val imagePickerLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.GetContent()
+    ) { uri: Uri? ->
+        if (uri != null) {
+            imageUri = uri
+        }
+    }
 
     Scaffold(
         snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
@@ -59,9 +52,10 @@ fun EditDiaryScreen(
                     IconButton(onClick = {
                         entry.title = title
                         entry.content = content
+                        entry.imageUri = imageUri?.toString()
                         onSave()
                         coroutineScope.launch {
-                            snackbarHostState.showSnackbar("Catatan disimpan ✅")
+                            snackbarHostState.showSnackbar("Catatan disimpan")
                             onNavigateBack()
                         }
                     }) {
@@ -72,7 +66,7 @@ fun EditDiaryScreen(
                     IconButton(onClick = {
                         onDelete()
                         coroutineScope.launch {
-                            snackbarHostState.showSnackbar("Catatan dihapus 🗑️")
+                            snackbarHostState.showSnackbar("Catatan dihapus ")
                             onNavigateBack()
                         }
                     }) {
@@ -82,39 +76,56 @@ fun EditDiaryScreen(
             )
         }
     ) { padding ->
-        Column(modifier = Modifier
-            .padding(padding)
-            .padding(16.dp)
-            .fillMaxSize()
+        Column(
+            modifier = Modifier
+                .padding(padding)
+                .padding(16.dp)
+                .fillMaxSize()
         ) {
-            //judul notes
+            // Tampilkan gambar jika ada
+            imageUri?.let {
+                AsyncImage(
+                    model = it,
+                    contentDescription = "Selected Image",
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(200.dp)
+                        .clip(RoundedCornerShape(8.dp))
+                )
+                Spacer(modifier = Modifier.height(16.dp))
+            }
+
+            // judul notes
             OutlinedTextField(
                 value = title,
                 onValueChange = { title = it },
                 label = { Text("Edit Judul") },
-                modifier = Modifier
-                    .fillMaxWidth()
+                modifier = Modifier.fillMaxWidth()
             )
 
-            //isi notes
+            Spacer(modifier = Modifier.height(16.dp))
+
+            // Isi
             OutlinedTextField(
                 value = content,
                 onValueChange = { content = it },
                 label = { Text("Edit Catatan") },
                 modifier = Modifier
-                    .fillMaxSize()
-                    .padding(top = 16.dp)
+                    .fillMaxWidth()
+                    .weight(1f)
             )
 
             Spacer(modifier = Modifier.height(12.dp))
 
-            // geotag & media button
+            // Tombol bawah
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceEvenly
             ) {
                 Button(
-                    onClick = { /* TODO: Open Media Picker */ },
+                    onClick = {
+                        imagePickerLauncher.launch("image/*")
+                    },
                     modifier = Modifier.weight(1f)
                 ) {
                     Icon(Icons.Default.Image, contentDescription = "Media")
@@ -125,7 +136,7 @@ fun EditDiaryScreen(
                 Spacer(Modifier.width(12.dp))
 
                 Button(
-                    onClick = { /* TODO: Open Geotag */ },
+                    onClick = { /* TODO: implement Geotag */ },
                     modifier = Modifier.weight(1f)
                 ) {
                     Icon(Icons.Default.Place, contentDescription = "Geotag")

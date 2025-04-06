@@ -1,45 +1,30 @@
+@file:OptIn(ExperimentalMaterial3Api::class)
+
 package com.android.example.uts_map.ui.screen.journey
 
+import android.net.Uri
 import android.os.Build
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Image
 import androidx.compose.material.icons.filled.Place
-import androidx.compose.material3.Button
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.OutlinedTextFieldDefaults
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
+import coil.compose.AsyncImage
 import com.android.example.uts_map.model.DiaryEntry
 import com.android.example.uts_map.utils.getCurrentTimeString
 import com.android.example.uts_map.utils.getTodayDateString
 import kotlin.random.Random
 
-@OptIn(ExperimentalMaterial3Api::class)
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun NewEntryScreen(
@@ -48,8 +33,15 @@ fun NewEntryScreen(
     var title by remember { mutableStateOf("") }
     var content by remember { mutableStateOf("") }
     var selectedDate by remember { mutableStateOf(getTodayDateString()) }
-
     val time = remember { getCurrentTimeString() }
+
+    var imageUri by remember { mutableStateOf<Uri?>(null) }
+
+    val imagePickerLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.GetContent()
+    ) { uri: Uri? ->
+        if (uri != null) imageUri = uri
+    }
 
     Scaffold(
         topBar = {
@@ -59,11 +51,13 @@ fun NewEntryScreen(
                     IconButton(onClick = {
                         if (title.isNotBlank() || content.isNotBlank()) {
                             val newEntry = DiaryEntry(
-                                id = Random.nextInt(),
+                                id = Random.nextInt(1000, 9999), // 🔐 Hindari id duplikat
                                 date = selectedDate,
                                 time = time,
                                 title = title,
-                                content = content
+                                content = content,
+                                imageUri = imageUri?.toString(),
+                                location = null
                             )
                             onSave(newEntry)
                         }
@@ -72,8 +66,12 @@ fun NewEntryScreen(
                     }
                 },
                 actions = {
-                    IconButton(onClick = { /* TODO: Delete */ }) {
-                        Icon(Icons.Default.Delete, contentDescription = "Delete")
+                    IconButton(onClick = {
+                        title = ""
+                        content = ""
+                        imageUri = null
+                    }) {
+                        Icon(Icons.Default.Delete, contentDescription = "Reset")
                     }
                 }
             )
@@ -83,15 +81,27 @@ fun NewEntryScreen(
             modifier = Modifier
                 .padding(padding)
                 .padding(horizontal = 16.dp)
-                .fillMaxSize(),
-            verticalArrangement = Arrangement.Top
+                .fillMaxSize()
         ) {
-            // select date
+            // Tampilkan gambar jika ada
+            imageUri?.let {
+                AsyncImage(
+                    model = it,
+                    contentDescription = "Selected Image",
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(200.dp)
+                        .clip(RoundedCornerShape(8.dp))
+                )
+                Spacer(modifier = Modifier.height(16.dp))
+            }
+
+            // 📅 Tanggal
             DateSelector(selectedDate) { selectedDate = it }
 
             Spacer(modifier = Modifier.height(12.dp))
 
-            // judul notes
+            // 📝 Judul
             OutlinedTextField(
                 value = title,
                 onValueChange = { title = it },
@@ -101,29 +111,27 @@ fun NewEntryScreen(
 
             Spacer(modifier = Modifier.height(12.dp))
 
-            // isi notes
+            // 📄 Isi catatan
             OutlinedTextField(
                 value = content,
                 onValueChange = { content = it },
                 label = { Text("Isi catatan") },
                 modifier = Modifier
                     .fillMaxWidth()
-                    .weight(1f),
-                colors = OutlinedTextFieldDefaults.colors(
-                    focusedContainerColor = MaterialTheme.colorScheme.surface,
-                    unfocusedContainerColor = MaterialTheme.colorScheme.surface
-                )
+                    .weight(1f)
             )
 
             Spacer(modifier = Modifier.height(12.dp))
 
-            // geotag & media button
+            // 📷 Tombol Media & Geotag
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceEvenly
             ) {
                 Button(
-                    onClick = { /* TODO: Open Media Picker */ },
+                    onClick = {
+                        imagePickerLauncher.launch("image/*")
+                    },
                     modifier = Modifier.weight(1f)
                 ) {
                     Icon(Icons.Default.Image, contentDescription = "Media")
@@ -134,7 +142,7 @@ fun NewEntryScreen(
                 Spacer(Modifier.width(12.dp))
 
                 Button(
-                    onClick = { /* TODO: Open Geotag */ },
+                    onClick = { /* TODO: implement Geotag */ },
                     modifier = Modifier.weight(1f)
                 ) {
                     Icon(Icons.Default.Place, contentDescription = "Geotag")
