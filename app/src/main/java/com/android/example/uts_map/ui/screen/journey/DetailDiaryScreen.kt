@@ -1,8 +1,6 @@
 package com.android.example.uts_map.ui.screen.journey
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -15,7 +13,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.ArrowForward
 import androidx.compose.material.icons.filled.Edit
-import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -72,9 +69,11 @@ fun DetailDiaryScreen(
                         .height(200.dp)
                         .clip(RoundedCornerShape(8.dp))
                 )
+
+                Spacer(modifier = Modifier.height(8.dp))
             }
 
-            // 📅 Tanggal + waktu
+            //Tanggal + waktu
             Text(
                 text = "${entry.date}\n${entry.time}",
                 style = MaterialTheme.typography.labelMedium,
@@ -83,7 +82,7 @@ fun DetailDiaryScreen(
 
             Spacer(modifier = Modifier.height(12.dp))
 
-            // 📝 Isi Catatan
+            //Isi Catatan
             Text(
                 text = entry.content,
                 style = MaterialTheme.typography.bodyLarge
@@ -91,7 +90,7 @@ fun DetailDiaryScreen(
 
             Spacer(modifier = Modifier.height(24.dp))
 
-            // ⬅️➡️ Navigasi
+            //Navigasi
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween

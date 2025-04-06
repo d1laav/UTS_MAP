@@ -33,8 +33,10 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import coil.compose.AsyncImage
 import com.android.example.uts_map.model.DiaryEntry
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
@@ -148,7 +150,17 @@ fun DiaryEntryItem(
                 ),
             contentAlignment = Alignment.Center
         ) {
-            Text("📷", style = MaterialTheme.typography.titleSmall)
+            if (!entry.imageUri.isNullOrBlank()) {
+                AsyncImage(
+                    model = entry.imageUri,
+                    contentDescription = "Thumbnail",
+                    modifier = Modifier
+                        .size(64.dp)
+                        .clip(RoundedCornerShape(8.dp))
+                )
+            } else {
+                Text("📷", style = MaterialTheme.typography.titleSmall)
+            }
         }
     }
 }
