@@ -22,7 +22,8 @@ import androidx.compose.ui.unit.dp
 @Composable
 fun WelcomeScreen(
     onNavigateToLogin: () -> Unit,
-    onNavigateToRegister: () -> Unit
+    onNavigateToRegister: () -> Unit,
+    onStart: () -> Unit
 ) {
     Column(
         modifier = Modifier
@@ -71,6 +72,7 @@ fun WelcomeScreen(
 fun WelcomeScreenPreview() {
     WelcomeScreen(
         onNavigateToLogin = {},
-        onNavigateToRegister = {}
+        onNavigateToRegister = {},
+        onStart = {}
     )
 }

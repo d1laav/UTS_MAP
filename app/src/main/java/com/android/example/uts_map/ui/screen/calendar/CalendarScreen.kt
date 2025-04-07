@@ -23,9 +23,12 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.ArrowForward
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -35,6 +38,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
+import androidx.navigation.NavHostController
+import com.android.example.uts_map.model.DiaryEntry
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.util.Locale
@@ -42,16 +48,43 @@ import java.util.Locale
 @OptIn(ExperimentalMaterial3Api::class)
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun CalendarScreen() {
+fun CalendarScreen(
+    diaryList: List<DiaryEntry>,
+    onEntryClick: (DiaryEntry) -> Unit,
+    navController: NavHostController,
+) {
     var selectedDate by remember { mutableStateOf(LocalDate.now()) }
+
+    val formatter = DateTimeFormatter.ofPattern("MMMM dd, yyyy", Locale.ENGLISH)
+    val selectedDateString = selectedDate.format(formatter)
+
+    val filteredEntries = diaryList.filter { it.date == selectedDateString }
 
     Scaffold(
         topBar = {
             TopAppBar(
                 title = { Text("Halo, user123") },
                 actions = {
-                    IconButton(onClick = { /* Profile pic */ }) {
+                    var expanded by remember { mutableStateOf(false) }
+
+                    IconButton(onClick = { expanded = true }) {
                         Icon(Icons.Default.AccountCircle, contentDescription = "Profile")
+                    }
+
+                    DropdownMenu(
+                        expanded = expanded,
+                        onDismissRequest = { expanded = false }
+                    ) {
+                        DropdownMenuItem(
+                            text = { Text("Logout") },
+                            onClick = {
+                                expanded = false
+                                navController.navigate("welcome") {
+                                    popUpTo(0) { inclusive = true } // Hapus seluruh backstack
+                                }
+                            }
+
+                        )
                     }
                 }
             )
@@ -74,11 +107,40 @@ fun CalendarScreen() {
 
             CalendarGrid(
                 selectedDate = selectedDate,
-                onDateSelected = { selectedDate = it }
+                onDateSelected = { selectedDate = it },
+                diaryList = diaryList
             )
+
+            Spacer(modifier = Modifier.height(24.dp))
+
+            // display catatan dari tanggal terpilih
+            if (filteredEntries.isEmpty()) {
+                Text("Tidak ada catatan di tanggal ini.")
+            } else {
+                filteredEntries.forEach { entry ->
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clickable { onEntryClick(entry) }
+                            .padding(vertical = 8.dp, horizontal = 4.dp)
+                    ) {
+                        Text(
+                            text = "${entry.time} - ${entry.title}",
+                            style = MaterialTheme.typography.titleSmall,
+                            modifier = Modifier.padding(bottom = 2.dp)
+                        )
+                        Text(
+                            text = entry.content.take(100) + if (entry.content.length > 100) "..." else "",
+                            style = MaterialTheme.typography.bodySmall
+                        )
+                    }
+                }
+
+            }
         }
     }
 }
+
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
@@ -106,22 +168,23 @@ fun CalendarHeader(
     }
 }
 
-
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun CalendarGrid(
     selectedDate: LocalDate,
-    onDateSelected: (LocalDate) -> Unit
+    onDateSelected: (LocalDate) -> Unit,
+    diaryList: List<DiaryEntry>
 ) {
     val today = LocalDate.now()
     val startOfMonth = selectedDate.withDayOfMonth(1)
     val endOfMonth = startOfMonth.withDayOfMonth(startOfMonth.lengthOfMonth())
-    val firstDayOfWeek = (startOfMonth.dayOfWeek.value % 7) // Sunday = 0
+    val firstDayOfWeek = (startOfMonth.dayOfWeek.value % 7)
     val totalDays = firstDayOfWeek + endOfMonth.dayOfMonth
     val weeks = (totalDays + 6) / 7
 
+    val formatter = DateTimeFormatter.ofPattern("MMMM dd, yyyy", Locale.ENGLISH)
+
     Column(modifier = Modifier.fillMaxWidth()) {
-        // Header Hari
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceEvenly
@@ -133,17 +196,13 @@ fun CalendarGrid(
                         .aspectRatio(1f),
                     contentAlignment = Alignment.Center
                 ) {
-                    Text(
-                        text = day,
-                        style = MaterialTheme.typography.labelSmall
-                    )
+                    Text(day, style = MaterialTheme.typography.labelSmall)
                 }
             }
         }
 
         Spacer(modifier = Modifier.height(8.dp))
 
-        // Tanggal
         for (week in 0 until weeks) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -154,6 +213,9 @@ fun CalendarGrid(
                     val currentDay = startOfMonth.withDayOfMonth(
                         dayNumber.coerceIn(1, endOfMonth.dayOfMonth)
                     )
+
+                    val currentDayString = currentDay.format(formatter)
+                    val hasNote = diaryList.any { it.date == currentDayString }
 
                     Box(
                         modifier = Modifier
@@ -175,14 +237,27 @@ fun CalendarGrid(
                         contentAlignment = Alignment.Center
                     ) {
                         if (dayNumber in 1..endOfMonth.dayOfMonth) {
-                            Text(
-                                text = dayNumber.toString(),
-                                style = if (currentDay == selectedDate) {
-                                    MaterialTheme.typography.titleMedium
-                                } else {
-                                    MaterialTheme.typography.bodyMedium
+                            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                                Text(
+                                    text = dayNumber.toString(),
+                                    style = if (currentDay == selectedDate) {
+                                        MaterialTheme.typography.titleMedium
+                                    } else {
+                                        MaterialTheme.typography.bodyMedium
+                                    }
+                                )
+                                if (hasNote) {
+                                    Spacer(modifier = Modifier.height(2.dp))
+                                    Box(
+                                        modifier = Modifier
+                                            .size(6.dp)
+                                            .background(
+                                                MaterialTheme.colorScheme.primary,
+                                                shape = RoundedCornerShape(50)
+                                            )
+                                    )
                                 }
-                            )
+                            }
                         }
                     }
                 }

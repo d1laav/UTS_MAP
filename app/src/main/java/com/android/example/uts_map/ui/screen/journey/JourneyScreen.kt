@@ -103,6 +103,10 @@ fun JourneyScreen(
                             contentDescription = if (isSearching) "Tutup pencarian" else "Cari"
                         )
                     }
+
+                    var expanded by remember { mutableStateOf(false)}
+
+
                 }
             )
         },

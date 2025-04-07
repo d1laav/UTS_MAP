@@ -82,6 +82,14 @@ fun DetailDiaryScreen(
 
             Spacer(modifier = Modifier.height(12.dp))
 
+            // Judul
+            Text(
+                text = entry.title,
+                style = MaterialTheme.typography.titleLarge
+            )
+
+            Spacer(modifier = Modifier.height(12.dp))
+
             //Isi Catatan
             Text(
                 text = entry.content,

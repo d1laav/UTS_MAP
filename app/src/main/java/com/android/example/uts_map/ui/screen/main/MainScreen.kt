@@ -7,6 +7,8 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
+import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.*
 import androidx.navigation.navArgument
@@ -79,6 +81,7 @@ fun MainScreen() {
                     }
                 )
             }
+
             composable("new_entry") {
                 NewEntryScreen(
                     onSave = { newEntry ->
@@ -154,7 +157,13 @@ fun MainScreen() {
 
             composable("calendar") {
                 println(">> Showing Calendar Screen")
-                CalendarScreen()
+                CalendarScreen(
+                    diaryList = diaryList,
+                    onEntryClick = { entry ->
+                        navController.navigate("detail_entry/${entry.id}")
+                    },
+                    navController = navController
+                )
             }
             composable("media") {
                 println(">> Showing Media Screen")

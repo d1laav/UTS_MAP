@@ -20,7 +20,12 @@ fun AuthNavGraph(navController: NavHostController = rememberNavController()) {
         composable("welcome") {
             WelcomeScreen(
                 onNavigateToLogin = {navController.navigate("login") },
-                onNavigateToRegister = { navController.navigate("register") }
+                onNavigateToRegister = { navController.navigate("register") },
+                onStart = {
+                    navController.navigate("journey") {
+                        popUpTo("welcome") {inclusive = true}
+                    }
+                }
             )
         }
 
