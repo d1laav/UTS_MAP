@@ -60,6 +60,7 @@ fun DetailDiaryScreen(
                 .padding(16.dp)
                 .fillMaxSize()
         ) {
+            // gambar
             if (!entry.imageUri.isNullOrBlank()) {
                 AsyncImage(
                     model = entry.imageUri,

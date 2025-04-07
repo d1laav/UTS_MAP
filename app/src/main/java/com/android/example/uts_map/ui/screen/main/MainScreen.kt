@@ -19,6 +19,7 @@ import com.android.example.uts_map.ui.screen.journey.DetailDiaryScreen
 import com.android.example.uts_map.ui.screen.journey.EditDiaryScreen
 import com.android.example.uts_map.ui.screen.journey.JourneyScreen
 import com.android.example.uts_map.ui.screen.journey.NewEntryScreen
+import com.android.example.uts_map.ui.screen.media.MediaScreen
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
@@ -167,7 +168,12 @@ fun MainScreen() {
             }
             composable("media") {
                 println(">> Showing Media Screen")
-                Text("Media Screen", modifier = Modifier.padding(16.dp))
+                MediaScreen(
+                    diaryList = diaryList,
+                    onProfileClick = {
+                        // ** profile di click **
+                    }
+                )
             }
             composable("atlas") {
                 println(">> Showing Atlas Screen")
