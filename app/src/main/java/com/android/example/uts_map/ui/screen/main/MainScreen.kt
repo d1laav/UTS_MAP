@@ -12,6 +12,7 @@ import androidx.navigation.compose.*
 import androidx.navigation.navArgument
 import com.android.example.uts_map.model.DiaryEntry
 import com.android.example.uts_map.ui.component.navbar.BottomNavigationBar
+import com.android.example.uts_map.ui.screen.calendar.CalendarScreen
 import com.android.example.uts_map.ui.screen.journey.DetailDiaryScreen
 import com.android.example.uts_map.ui.screen.journey.EditDiaryScreen
 import com.android.example.uts_map.ui.screen.journey.JourneyScreen
@@ -153,7 +154,7 @@ fun MainScreen() {
 
             composable("calendar") {
                 println(">> Showing Calendar Screen")
-                Text("Calendar Screen", modifier = Modifier.padding(16.dp))
+                CalendarScreen()
             }
             composable("media") {
                 println(">> Showing Media Screen")

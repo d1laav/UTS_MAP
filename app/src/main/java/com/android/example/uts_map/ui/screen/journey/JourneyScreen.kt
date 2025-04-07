@@ -88,7 +88,7 @@ fun JourneyScreen(
                             }
                         )
                     } else {
-                        Text("Halo, Nama Pengguna")
+                        Text("Halo, user1234")
                     }
                 },
                 actions = {
