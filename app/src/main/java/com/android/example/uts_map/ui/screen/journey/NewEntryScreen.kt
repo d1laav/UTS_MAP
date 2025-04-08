@@ -145,7 +145,7 @@ fun NewEntryScreen(
 
                 Button(
                     onClick = {
-                        navController.navigate("map_picker")
+                        navController.navigate("map_picker/${entry.id}")
                     },
                     modifier = Modifier.weight(1f)
                 ) {

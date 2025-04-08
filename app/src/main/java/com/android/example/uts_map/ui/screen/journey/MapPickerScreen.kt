@@ -27,46 +27,39 @@ import com.google.maps.android.compose.rememberCameraPositionState
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MapPickerScreen(
-    initialLocation: LatLng = LatLng(-6.200000, 106.816666),
-    onLocationSelected: (LatLng) -> Unit,
+    entry: DiaryEntry,
+    onLocationSelected: (String) -> Unit,
     onBack: () -> Unit
 ) {
-    var selectedLocation by remember { mutableStateOf(initialLocation) }
+    var selectedLocation by remember { mutableStateOf<LatLng> }
     val cameraPositionState = rememberCameraPositionState {
         position = CameraPosition.fromLatLngZoom(initialLocation, 10f)
     }
 
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                title = { Text("Pilih Lokasi") },
-                navigationIcon = {
-                    IconButton(onClick = onBack) {
-                        Icon(Icons.Default.ArrowBack, contentDescription = "Kembali")
-                    }
-                },
-                actions = {
-                    IconButton(onClick = { onLocationSelected(selectedLocation) }) {
-                        Icon(Icons.Default.Check, contentDescription = "Pilih Lokasi")
-                    }
-                }
-            )
-        }
-    ) { padding ->
+    Box(modifier = Modifier.fillMaxSize()) {
         GoogleMap(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(padding),
+            modifier = Modifier.fillMaxSize(),
             cameraPositionState = cameraPositionState,
-            onMapClick = {
-                selectedLocation = it
-            }
+            onMapClick = { selectedLatLng = it }
         ) {
-            Marker(
-                state = MarkerState(position = selectedLocation),
-                title = "Lokasi Terpilih"
-            )
+            selectedLatLng?.let {
+                Marker(state = MarkerState(position = it), title = "Lokasi Dipilih")
+            }
+        }
 
+        Button(
+            onClick = {
+                selectedLatLng?.let {
+                    val locationString = "${it.latitude},${it.longitude}"
+                    onLocationSelected(locationString)
+                    onBack()
+                }
+            },
+            modifier = Modifier
+                .align(Alignment.BottomCenter)
+                .padding(16.dp)
+        ) {
+            Text("Simpan Lokasi")
         }
     }
 }

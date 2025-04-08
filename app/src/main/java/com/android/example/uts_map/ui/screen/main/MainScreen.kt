@@ -18,6 +18,7 @@ import com.android.example.uts_map.ui.screen.calendar.CalendarScreen
 import com.android.example.uts_map.ui.screen.journey.DetailDiaryScreen
 import com.android.example.uts_map.ui.screen.journey.EditDiaryScreen
 import com.android.example.uts_map.ui.screen.journey.JourneyScreen
+import com.android.example.uts_map.ui.screen.journey.MapPickerScreen
 import com.android.example.uts_map.ui.screen.journey.NewEntryScreen
 import com.android.example.uts_map.ui.screen.media.MediaScreen
 
@@ -129,6 +130,7 @@ fun MainScreen() {
                     )
                 }
             }
+
             composable("edit_entry/{id}") { backStackEntry ->
                 val entryId = backStackEntry.arguments?.getString("id")?.toIntOrNull()
                 val entry = diaryList.find { it.id == entryId }
@@ -155,6 +157,22 @@ fun MainScreen() {
                 }
             }
 
+            composable("map_picker/{id}") { backStackEntry ->
+                val entryId = backStackEntry.arguments?.getString("id")?.toIntOrNull()
+                val entry = diaryList.find { it.id == entryId }
+
+                if (entry != null) {
+                    MapPickerScreen(
+                        entry = entry,
+                        onLocationSelected = { location ->
+                            entry.location = location
+                        },
+                        onBack = {
+                            navController.popBackStack()
+                        }
+                    )
+                }
+            }
 
             composable("calendar") {
                 println(">> Showing Calendar Screen")
