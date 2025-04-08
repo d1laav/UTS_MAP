@@ -21,9 +21,11 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import com.android.example.uts_map.model.DiaryEntry
@@ -37,6 +39,9 @@ fun DetailDiaryScreen(
     onPrevClick: () -> Unit,
     onNextClick: () -> Unit
 ) {
+    val context = LocalContext.current
+    val address = remember(entry.location) { getReadableLocation(entry.location ?: "", context) }
+
     Scaffold(
         topBar = {
             TopAppBar(
@@ -99,16 +104,13 @@ fun DetailDiaryScreen(
 
             Spacer(modifier = Modifier.height(12.dp))
 
-            // Lokasi (Geotag)
-            entry.location?.let { location ->
-                if (location.isNotBlank()) {
-                    Spacer(modifier = Modifier.height(16.dp))
-                    Text(
-                        text = "📍 Lokasi: $location",
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.primary
-                    )
-                }
+            if (!entry.location.isNullOrBlank()) {
+                Spacer(modifier = Modifier.height(12.dp))
+                Text(
+                    text = "📍 Lokasi: $address",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.primary
+                )
             }
 
             Spacer(modifier = Modifier.height(24.dp))
