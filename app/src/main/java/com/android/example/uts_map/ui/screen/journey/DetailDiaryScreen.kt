@@ -1,5 +1,7 @@
 package com.android.example.uts_map.ui.screen.journey
 
+import android.content.Context
+import android.location.Geocoder
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -29,6 +31,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import com.android.example.uts_map.model.DiaryEntry
+import com.google.android.gms.maps.model.LatLng
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -40,7 +43,12 @@ fun DetailDiaryScreen(
     onNextClick: () -> Unit
 ) {
     val context = LocalContext.current
-    val address = remember(entry.location) { getReadableLocation(entry.location ?: "", context) }
+
+    // Mengonversi entry.location menjadi LatLng
+    val latLng = stringToLatLng(entry.location)
+
+    // Mengambil alamat berdasarkan LatLng yang dikonversi menggunakan fungsi dari LocationUtils.kt
+    val address = remember(latLng) { getReadableLocation(context, latLng) }
 
     Scaffold(
         topBar = {
@@ -65,7 +73,7 @@ fun DetailDiaryScreen(
                 .padding(16.dp)
                 .fillMaxSize()
         ) {
-            // gambar
+            // Gambar (Jika ada)
             if (!entry.imageUri.isNullOrBlank()) {
                 AsyncImage(
                     model = entry.imageUri,
@@ -96,7 +104,7 @@ fun DetailDiaryScreen(
 
             Spacer(modifier = Modifier.height(12.dp))
 
-            //Isi Catatan
+            // Isi Catatan
             Text(
                 text = entry.content,
                 style = MaterialTheme.typography.bodyLarge
@@ -104,6 +112,7 @@ fun DetailDiaryScreen(
 
             Spacer(modifier = Modifier.height(12.dp))
 
+            // Menampilkan lokasi jika ada
             if (!entry.location.isNullOrBlank()) {
                 Spacer(modifier = Modifier.height(12.dp))
                 Text(
@@ -115,7 +124,7 @@ fun DetailDiaryScreen(
 
             Spacer(modifier = Modifier.height(24.dp))
 
-            //Navigasi
+            // Navigasi
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween
@@ -131,3 +140,4 @@ fun DetailDiaryScreen(
         }
     }
 }
+

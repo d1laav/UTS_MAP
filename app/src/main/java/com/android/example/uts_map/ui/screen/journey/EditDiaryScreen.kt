@@ -47,7 +47,8 @@ fun EditDiaryScreen(
     }
 
     val context = LocalContext.current
-    val address = remember(entry.location) { getReadableLocation(entry.location ?: "", context) }
+    val latLng = stringToLatLng(entry.location)
+    val address = remember(latLng) { getReadableLocation(context, latLng) }
 
     Scaffold(
         snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
