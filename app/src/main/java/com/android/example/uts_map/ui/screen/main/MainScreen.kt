@@ -159,13 +159,11 @@ fun MainScreen() {
                 val entryIdStr = backStackEntry.arguments?.getString("id")
                 val entry = diaryList.find { it.id.toString() == entryIdStr }
 
-                // Untuk kasus "new", bisa tampilkan map tanpa entry
                 if (entryIdStr == "new") {
                     MapPickerScreen(
-                        entry = null, // Handle null entry di dalam MapPickerScreen
+                        entry = null,
                         onLocationSelected = { location ->
-                            // Misalnya simpan lokasi di remember var di NewEntryScreen
-                            // atau lewat ViewModel jika pakai
+                            // simpan lokasi di remember var di NewEntryScreen
                         },
                         onBack = { navController.popBackStack() }
                     )

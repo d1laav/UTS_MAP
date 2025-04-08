@@ -98,12 +98,12 @@ fun NewEntryScreen(
                 Spacer(modifier = Modifier.height(16.dp))
             }
 
-            // 📅 Tanggal
+            // Tanggal
             DateSelector(selectedDate) { selectedDate = it }
 
             Spacer(modifier = Modifier.height(12.dp))
 
-            // 📝 Judul
+            // Judul
             OutlinedTextField(
                 value = title,
                 onValueChange = { title = it },
@@ -113,7 +113,7 @@ fun NewEntryScreen(
 
             Spacer(modifier = Modifier.height(12.dp))
 
-            // 📄 Isi catatan
+            // Isi catatan
             OutlinedTextField(
                 value = content,
                 onValueChange = { content = it },

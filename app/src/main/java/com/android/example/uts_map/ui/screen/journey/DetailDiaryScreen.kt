@@ -74,7 +74,7 @@ fun DetailDiaryScreen(
                 Spacer(modifier = Modifier.height(8.dp))
             }
 
-            //Tanggal + waktu
+            // Tanggal + waktu
             Text(
                 text = "${entry.date}\n${entry.time}",
                 style = MaterialTheme.typography.labelMedium,
@@ -96,6 +96,20 @@ fun DetailDiaryScreen(
                 text = entry.content,
                 style = MaterialTheme.typography.bodyLarge
             )
+
+            Spacer(modifier = Modifier.height(12.dp))
+
+            // Lokasi (Geotag)
+            entry.location?.let { location ->
+                if (location.isNotBlank()) {
+                    Spacer(modifier = Modifier.height(16.dp))
+                    Text(
+                        text = "📍 Lokasi: $location",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.primary
+                    )
+                }
+            }
 
             Spacer(modifier = Modifier.height(24.dp))
 

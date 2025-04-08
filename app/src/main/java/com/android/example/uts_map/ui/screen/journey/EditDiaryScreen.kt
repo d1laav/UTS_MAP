@@ -16,6 +16,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
@@ -44,6 +45,9 @@ fun EditDiaryScreen(
             imageUri = uri
         }
     }
+
+    val context = LocalContext.current
+    val address = remember(entry.location) { getReadableLocation(entry.location ?: "", context) }
 
     Scaffold(
         snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
@@ -116,6 +120,17 @@ fun EditDiaryScreen(
                     .fillMaxWidth()
                     .weight(1f)
             )
+
+            Spacer(modifier = Modifier.height(12.dp))
+
+            if (!entry.location.isNullOrBlank()) {
+                Spacer(modifier = Modifier.height(12.dp))
+                Text(
+                    text = "📍 Lokasi: $address",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.primary
+                )
+            }
 
             Spacer(modifier = Modifier.height(12.dp))
 
