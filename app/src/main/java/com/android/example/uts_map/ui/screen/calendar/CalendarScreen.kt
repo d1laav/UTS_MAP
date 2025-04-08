@@ -51,7 +51,7 @@ import java.util.Locale
 fun CalendarScreen(
     diaryList: List<DiaryEntry>,
     onEntryClick: (DiaryEntry) -> Unit,
-    navController: NavHostController,
+    navController: NavController,
 ) {
     var selectedDate by remember { mutableStateOf(LocalDate.now()) }
 

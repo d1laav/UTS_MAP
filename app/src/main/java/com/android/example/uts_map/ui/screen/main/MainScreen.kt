@@ -7,8 +7,6 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavController
-import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.*
 import androidx.navigation.navArgument
@@ -158,21 +156,30 @@ fun MainScreen() {
             }
 
             composable("map_picker/{id}") { backStackEntry ->
-                val entryId = backStackEntry.arguments?.getString("id")?.toIntOrNull()
-                val entry = diaryList.find { it.id == entryId }
+                val entryIdStr = backStackEntry.arguments?.getString("id")
+                val entry = diaryList.find { it.id.toString() == entryIdStr }
 
-                if (entry != null) {
+                // Untuk kasus "new", bisa tampilkan map tanpa entry
+                if (entryIdStr == "new") {
+                    MapPickerScreen(
+                        entry = null, // Handle null entry di dalam MapPickerScreen
+                        onLocationSelected = { location ->
+                            // Misalnya simpan lokasi di remember var di NewEntryScreen
+                            // atau lewat ViewModel jika pakai
+                        },
+                        onBack = { navController.popBackStack() }
+                    )
+                } else if (entry != null) {
                     MapPickerScreen(
                         entry = entry,
                         onLocationSelected = { location ->
                             entry.location = location
                         },
-                        onBack = {
-                            navController.popBackStack()
-                        }
+                        onBack = { navController.popBackStack() }
                     )
                 }
             }
+
 
             composable("calendar") {
                 println(">> Showing Calendar Screen")

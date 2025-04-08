@@ -30,8 +30,8 @@ import kotlin.random.Random
 @Composable
 fun NewEntryScreen(
     onSave: (DiaryEntry) -> Unit,
-    navController: NavController
-) {
+    navController: NavController)
+ {
     var title by remember { mutableStateOf("") }
     var content by remember { mutableStateOf("") }
     var selectedDate by remember { mutableStateOf(getTodayDateString()) }
@@ -53,7 +53,7 @@ fun NewEntryScreen(
                     IconButton(onClick = {
                         if (title.isNotBlank() || content.isNotBlank()) {
                             val newEntry = DiaryEntry(
-                                id = Random.nextInt(1000, 9999), // 🔐 Hindari id duplikat
+                                id = Random.nextInt(1000, 9999), // Hindari id duplikat
                                 date = selectedDate,
                                 time = time,
                                 title = title,
@@ -145,7 +145,7 @@ fun NewEntryScreen(
 
                 Button(
                     onClick = {
-                        navController.navigate("map_picker/${entry.id}")
+                        navController.navigate("map_picker/new")
                     },
                     modifier = Modifier.weight(1f)
                 ) {
