@@ -2,22 +2,22 @@ package com.android.example.uts_map.ui.screen.journey
 
 import android.content.Context
 import android.location.Geocoder
-import java.util.Locale
+import com.google.android.gms.maps.model.LatLng
 
-fun getReadableLocation(location: String, context: Context): String {
-    return try {
-        val geocoder = Geocoder(context, Locale.getDefault())
-        val parts = location.split(",")
-        val lat = parts[0].toDoubleOrNull()
-        val lon = parts[1].toDoubleOrNull()
+fun getReadableLocation(context: Context, latLng: LatLng): String {
+    val geocoder = Geocoder(context)
+    val addresses = geocoder.getFromLocation(latLng.latitude, latLng.longitude, 1)
+    val address = addresses?.firstOrNull()  // Menggunakan safe call dan mengambil elemen pertama jika ada, jika tidak null
+    val addressLine = address?.getAddressLine(0) ?: "Alamat tidak ditemukan"
 
-        if (lat != null && lon != null) {
-            val addresses = geocoder.getFromLocation(lat, lon, 1)
-            addresses?.firstOrNull()?.getAddressLine(0) ?: location
-        } else {
-            location
-        }
-    } catch (e: Exception) {
-        location // fallback kalau error
-    }
+    return addressLine
+
+}
+
+// Fungsi untuk mengonversi string lokasi menjadi LatLng
+fun stringToLatLng(location: String?): LatLng {
+    val latLngArray = location?.split(",") ?: return LatLng(-6.2, 106.8) // Default jika null
+    val latitude = latLngArray.getOrNull(0)?.toDoubleOrNull() ?: -6.2
+    val longitude = latLngArray.getOrNull(1)?.toDoubleOrNull() ?: 106.8
+    return LatLng(latitude, longitude)
 }
