@@ -12,6 +12,7 @@ import androidx.navigation.compose.*
 import androidx.navigation.navArgument
 import com.android.example.uts_map.model.DiaryEntry
 import com.android.example.uts_map.ui.component.navbar.BottomNavigationBar
+import com.android.example.uts_map.ui.screen.atlas.AtlasScreen
 import com.android.example.uts_map.ui.screen.calendar.CalendarScreen
 import com.android.example.uts_map.ui.screen.journey.DetailDiaryScreen
 import com.android.example.uts_map.ui.screen.journey.EditDiaryScreen
@@ -200,7 +201,10 @@ fun MainScreen() {
             }
             composable("atlas") {
                 println(">> Showing Atlas Screen")
-                Text("Atlas Screen", modifier = Modifier.padding(16.dp))
+                AtlasScreen(
+                    diaryEntries = diaryList,
+
+                ) { }
             }
         }
     }
