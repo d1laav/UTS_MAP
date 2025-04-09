@@ -6,15 +6,7 @@ import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -23,20 +15,8 @@ import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Search
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.ExtendedFloatingActionButton
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -53,9 +33,9 @@ import java.util.Locale
 fun JourneyScreen(
     diaryList: List<DiaryEntry>,
     onEntryClick: (DiaryEntry) -> Unit,
-    onNewEntryClick: () -> Unit
+    onNewEntryClick: () -> Unit,
+    onLogoutClick: () -> Unit // ✅ Tambahan untuk tombol logout
 ) {
-
     var searchQuery by remember { mutableStateOf("") }
     var isSearching by remember { mutableStateOf(false) }
 
@@ -104,9 +84,13 @@ fun JourneyScreen(
                         )
                     }
 
-                    var expanded by remember { mutableStateOf(false)}
-
-
+                    // ✅ Tombol Logout
+                    IconButton(onClick = onLogoutClick) {
+                        Icon(
+                            imageVector = Icons.Default.AccountCircle,
+                            contentDescription = "Logout"
+                        )
+                    }
                 }
             )
         },
@@ -118,20 +102,10 @@ fun JourneyScreen(
             )
         }
     ) { padding ->
-        val filteredList = if (searchQuery.isBlank()) {
-            diaryList
-        } else {
-            diaryList.filter {
-                it.title.contains(searchQuery, ignoreCase = true) ||
-                        it.content.contains(searchQuery, ignoreCase = true)
-            }
-        }
-
-        //filteredList yang sudah difilter dan disortir
         val formatter = DateTimeFormatter.ofPattern("MMMM dd, yyyy", Locale.ENGLISH)
 
         val grouped = filteredList
-            .sortedByDescending { LocalDate.parse(it.date, formatter) } // ⬅️ Sort di sini
+            .sortedByDescending { LocalDate.parse(it.date, formatter) }
             .groupBy { it.date }
 
         LazyColumn(
@@ -156,7 +130,6 @@ fun JourneyScreen(
                 }
             }
         }
-
     }
 }
 
@@ -173,7 +146,6 @@ fun DiaryEntryItem(
         verticalAlignment = Alignment.CenterVertically
     ) {
         Column(modifier = Modifier.weight(1f)) {
-            // Waktu dan Judul
             Text(
                 text = entry.time,
                 style = MaterialTheme.typography.labelSmall,
@@ -189,7 +161,6 @@ fun DiaryEntryItem(
 
             Spacer(modifier = Modifier.height(4.dp))
 
-            // Preview isi catatan
             Text(
                 text = entry.content.take(50) + if (entry.content.length > 50) "..." else "",
                 style = MaterialTheme.typography.bodySmall
@@ -221,6 +192,3 @@ fun DiaryEntryItem(
         }
     }
 }
-
-
-

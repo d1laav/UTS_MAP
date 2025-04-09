@@ -227,6 +227,12 @@ fun MainScreen() {
                             },
                             onNewEntryClick = {
                                 navController.navigate("new_entry")
+                            },
+                            onLogoutClick = {
+                                // Aksi logout: arahkan kembali ke halaman login
+                                navController.navigate("login") {
+                                    popUpTo("journey") { inclusive = true }
+                                }
                             }
                         )
                     }
