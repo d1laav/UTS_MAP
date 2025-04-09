@@ -18,6 +18,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -44,16 +45,30 @@ fun MapPickerScreen(
 ) {
     val context = LocalContext.current
     var searchQuery by remember { mutableStateOf("") }
+    var selectedLatLng by remember { mutableStateOf(LatLng(-6.2, 106.8)) }
+    var address by remember { mutableStateOf(getReadableLocation(context, selectedLatLng)) }
 
-    val initialLocation = remember {
-        entry?.location?.split(",")?.takeIf { it.size == 2 }?.let {
-            LatLng(it[0].toDoubleOrNull() ?: -6.2, it[1].toDoubleOrNull() ?: 106.8)
-        } ?: LatLng(-6.2, 106.8)
+    val cameraPositionState = rememberCameraPositionState {
+        position = CameraPosition.fromLatLngZoom(selectedLatLng, 10f)
     }
 
-    var selectedLatLng by remember { mutableStateOf(initialLocation) }
-    val cameraPositionState = rememberCameraPositionState {
-        position = CameraPosition.fromLatLngZoom(initialLocation, 10f)
+    // Menangani pencarian lokasi berdasarkan input pengguna
+    LaunchedEffect(searchQuery) {
+        if (searchQuery.length > 4) {  // Menunggu hingga lebih dari 4 karakter
+            val geocoder = Geocoder(context)
+            val results = geocoder.getFromLocationName(searchQuery, 1)
+            if (!results.isNullOrEmpty()) {
+                val result = results[0]
+                val newLatLng = LatLng(result.latitude, result.longitude)
+                selectedLatLng = newLatLng
+                cameraPositionState.move(CameraUpdateFactory.newLatLngZoom(newLatLng, 15f))
+            }
+        }
+    }
+
+    // Memperbarui alamat saat pin lokasi dipindahkan
+    LaunchedEffect(selectedLatLng) {
+        address = getReadableLocation(context, selectedLatLng)
     }
 
     Scaffold(
@@ -68,13 +83,9 @@ fun MapPickerScreen(
             )
         }
     ) { padding ->
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(padding)
-        ) {
+        Box(modifier = Modifier.fillMaxSize().padding(padding)) {
             Column {
-                // cari alamat (search)
+                // Kolom Pencarian Alamat
                 OutlinedTextField(
                     value = searchQuery,
                     onValueChange = { searchQuery = it },
@@ -84,6 +95,7 @@ fun MapPickerScreen(
                         .padding(8.dp),
                     trailingIcon = {
                         IconButton(onClick = {
+                            // Pencarian dilakukan secara langsung saat tombol search di-klik
                             val geocoder = Geocoder(context)
                             val results = geocoder.getFromLocationName(searchQuery, 1)
                             if (!results.isNullOrEmpty()) {
@@ -100,22 +112,31 @@ fun MapPickerScreen(
                     }
                 )
 
-                // google map
+                // Menampilkan alamat yang terbaca
+                Text(
+                    text = "Alamat: $address",
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(8.dp)
+                )
+
+                // Google Map dengan kemampuan drag pada peta (peta dapat digeser secara default)
                 GoogleMap(
                     modifier = Modifier
                         .fillMaxSize()
                         .weight(1f),
                     cameraPositionState = cameraPositionState,
-                    onMapClick = { selectedLatLng = it }
+                    onMapClick = { selectedLatLng = it } // Memperbarui pin saat peta diklik
                 ) {
                     Marker(
                         state = MarkerState(position = selectedLatLng),
                         title = "Lokasi Dipilih",
-                        snippet = "Klik Simpan Lokasi"
+                        snippet = "Klik Simpan Lokasi",
+                        draggable = false  // Marker tidak dapat dipindahkan secara langsung, tetapi peta bisa digeser
                     )
                 }
 
-                // save nya
+                // Tombol Simpan Lokasi
                 Button(
                     onClick = {
                         val locationString = "${selectedLatLng.latitude},${selectedLatLng.longitude}"
