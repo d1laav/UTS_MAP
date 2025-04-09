@@ -347,7 +347,6 @@ fun MainScreen() {
                         MediaScreen(
                             diaryList = diaryList,
                             onProfileClick = {
-                                // ** profile di click **
                             }
                         )
                     }
@@ -363,7 +362,7 @@ fun MainScreen() {
         fun isTablet(): Boolean {
             val configuration = LocalConfiguration.current
             val screenWidthDp = configuration.screenWidthDp
-            return screenWidthDp >= 600 // threshold tablet umumnya di 600dp
+            return screenWidthDp >= 600
         }
     }
 }
