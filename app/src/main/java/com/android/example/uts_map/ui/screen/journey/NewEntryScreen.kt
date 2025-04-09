@@ -97,7 +97,7 @@ fun NewEntryScreen(
                 )
                 Spacer(modifier = Modifier.height(16.dp))
             }
-
+            
             // Tanggal
             DateSelector(selectedDate) { selectedDate = it }
 

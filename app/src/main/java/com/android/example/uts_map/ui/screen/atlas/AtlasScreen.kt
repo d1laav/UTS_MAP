@@ -41,7 +41,7 @@ fun AtlasScreen(
         diaryEntries.mapNotNull { entry ->
             entry.location?.let {
                 val latLng = stringToLatLng(it)
-                Pair(latLng, entry.title) // Menyimpan latLng dan judul
+                Pair(latLng, entry.title) // simpan latLng dan judul
             }
         }
     }
@@ -73,19 +73,11 @@ fun AtlasScreen(
                         snippet = "Klik untuk melihat judul",
                         onClick = {
                             Toast.makeText(context, title, Toast.LENGTH_SHORT).show()
-                            true  // Return true untuk menangani klik marker
+                            true  // true untuk menangani klik marker
                         }
                     )
                 }
             }
         }
     }
-}
-
-// untuk mengonversi string lokasi menjadi LatLng
-fun stringToLatLng(location: String?): LatLng {
-    val latLngArray = location?.split(",") ?: return LatLng(-6.2, 106.8)  // Default jika null
-    val latitude = latLngArray.getOrNull(0)?.toDoubleOrNull() ?: -6.2
-    val longitude = latLngArray.getOrNull(1)?.toDoubleOrNull() ?: 106.8
-    return LatLng(latitude, longitude)
 }

@@ -85,6 +85,7 @@ fun MainScreen() {
 
             composable("new_entry") {
                 NewEntryScreen(
+
                     onSave = { newEntry ->
                         newEntry.id = idCounter.value++
                         diaryList.add(newEntry)
