@@ -61,18 +61,18 @@ fun AtlasScreen(
         Box(modifier = Modifier
             .fillMaxSize()
             .padding(padding)) {
-            // GoogleMap untuk menampilkan marker
+            // tampilan mark point
             GoogleMap(
-                modifier = Modifier.fillMaxSize(),  // Mengisi seluruh ruang
+                modifier = Modifier.fillMaxSize(),
                 cameraPositionState = cameraPositionState
             ) {
                 locationList.forEach { (latLng, title) ->
                     Marker(
-                        state = MarkerState(position = latLng), // Menyimpan posisi latLng
-                        title = title,  // Menampilkan judul sebagai title
-                        snippet = "Klik untuk melihat judul", // Snippet tambahan
+                        state = MarkerState(position = latLng),
+                        title = title,
+                        snippet = "Klik untuk melihat judul",
                         onClick = {
-                            Toast.makeText(context, title, Toast.LENGTH_SHORT).show()  // Menampilkan Toast dengan judul
+                            Toast.makeText(context, title, Toast.LENGTH_SHORT).show()
                             true  // Return true untuk menangani klik marker
                         }
                     )
@@ -82,7 +82,7 @@ fun AtlasScreen(
     }
 }
 
-// Fungsi untuk mengonversi string lokasi menjadi LatLng
+// untuk mengonversi string lokasi menjadi LatLng
 fun stringToLatLng(location: String?): LatLng {
     val latLngArray = location?.split(",") ?: return LatLng(-6.2, 106.8)  // Default jika null
     val latitude = latLngArray.getOrNull(0)?.toDoubleOrNull() ?: -6.2
